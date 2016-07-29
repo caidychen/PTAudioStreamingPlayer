@@ -55,14 +55,17 @@ class PTAudioPlayerController: NSObject {
     
     func play(){
         if self.streamer?.state == AS_PAUSED {
+            // This is to avoid progress bar out of sync by snapping current timeline into Integer value
             self.streamer?.seekToTime(Double(self.currentTime))
         }
         self.streamer?.start()
+        self.isPlaying = true
         self.audioPlayerView.setPlayingState(self.isPlaying)
     }
     
     func pause(){
         if self.streamer?.state == AS_PLAYING {
+            self.isPlaying = false
             self.streamer?.pause()
             self.audioPlayerView.setPlayingState(self.isPlaying)
         }
@@ -83,17 +86,17 @@ class PTAudioPlayerController: NSObject {
     func streamerNotification(notification:NSNotification){
         if let streamer:AudioStreamer = notification.object as? AudioStreamer{
             print("\(streamer.state)")
-        }
-        if streamer?.state == AS_PLAYING {
-            self.scheduleTimer()
-        }else{
-            if streamer?.state == AS_STOPPED {
-                // Reach the end of streaming, reset everything
-                self.reset()
-            }
-            
-            if let a = self.timer {
-                a.invalidate()
+            if streamer.state == AS_PLAYING {
+                self.scheduleTimer()
+            }else{
+                if streamer.state == AS_STOPPED {
+                    // Reach the end of streaming, reset everything
+                    self.reset()
+                }
+                
+                if let a = self.timer {
+                    a.invalidate()
+                }
             }
         }
     }
@@ -102,9 +105,8 @@ class PTAudioPlayerController: NSObject {
         if _audioPlayerView == nil {
             _audioPlayerView = PTAudioPlayerView(frame:CGRectZero)
             _audioPlayerView?.buttonToggleClosure = {
-                self.isPlaying = !self.isPlaying
                 
-                if self.isPlaying {
+                if !self.isPlaying {
                     self.play()
                 }else{
                     self.pause()

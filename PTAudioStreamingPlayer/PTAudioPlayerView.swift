@@ -9,6 +9,8 @@
 import UIKit
 
 typealias ButtonToggleClosure = () -> ()
+typealias SliderTouchBeganClosure = (slider:UISlider) -> ()
+typealias SliderTouchEndedClosure = (slider:UISlider) -> ()
 
 let kTimelineControlHeight:CGFloat = 30.0
 
@@ -20,6 +22,8 @@ class PTAudioPlayerView: UIView {
     var _progressBar: CustomProgressBar?
     var _playButton:UIButton?
     var buttonToggleClosure:ButtonToggleClosure?
+    var sliderTouchBeganClosure:SliderTouchBeganClosure?
+    var sliderTouchEndedClosure:SliderTouchEndedClosure?
     var currentTime:Int = 0
     var totalTime:Double = 0.0
     
@@ -84,6 +88,20 @@ class PTAudioPlayerView: UIView {
         }
     }
     
+    func sliderTouchBegan(){
+        print("Slider touch began")
+        if let a = self.sliderTouchBeganClosure {
+            a(slider: self.slider)
+        }
+    }
+    
+    func sliderTouchEnded(){
+        print("Slider touch Ended")
+        if let a = self.sliderTouchEndedClosure {
+            a(slider: self.slider)
+        }
+    }
+    
     func togglePlayButton(){
         if let a = self.buttonToggleClosure {
             a()
@@ -115,6 +133,8 @@ class PTAudioPlayerView: UIView {
             _slider?.maximumTrackTintColor = UIColor.clearColor()
             _slider?.thumbTintColor = UIColor.whiteColor()
             _slider?.currentThumbImage
+            _slider?.addTarget(self, action: #selector(sliderTouchBegan), forControlEvents: .TouchDown)
+            _slider?.addTarget(self, action: #selector(sliderTouchEnded), forControlEvents: .TouchUpInside)
         }
         return _slider!
     }

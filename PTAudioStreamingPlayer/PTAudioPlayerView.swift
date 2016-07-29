@@ -38,6 +38,8 @@ class PTAudioPlayerView: UIView {
     
     func setAttribute(totalTime:Double, progressColor:UIColor, loadingColor:UIColor){
         self.totalTime = totalTime
+        self.slider.minimumValue = 0.0
+        self.slider.maximumValue = Float(totalTime)
         self.updateTimelineLabel()
         self.currentTimeLabel.textColor = loadingColor
         self.totalTimeLabel.textColor = loadingColor
@@ -50,6 +52,7 @@ class PTAudioPlayerView: UIView {
     func updateCurrentTime(currentTime:Int){
         self.currentTime = currentTime
         self.updateTimelineLabel()
+        self.slider.value = Float(currentTime)
     }
     
     func updateTimelineLabel(){

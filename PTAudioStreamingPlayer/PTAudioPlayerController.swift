@@ -23,6 +23,7 @@ class PTAudioPlayerController: NSObject {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PTAudioPlayerController.streamerNotification(_:)), name: ASStatusChangedNotification, object: self.streamer)
         
         self.createStreamer()
+        self.reset()
     }
     
     func scheduleTimer(){
@@ -34,15 +35,37 @@ class PTAudioPlayerController: NSObject {
         self.audioPlayerView.setAttribute(totalTime, progressColor: progressColor, loadingColor: loadingColor)
     }
     
+    func createStreamer(){
+        self.destroyStreamer()
+        streamer = AudioStreamer(URL: NSURL(string:"http://od.qingting.fm/vod/00/00/0000000000000000000025364530_24.m4a"))
+    }
+    
+    func destroyStreamer(){
+        if let a = streamer{
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: ASStatusChangedNotification, object: a)
+            a.stop()
+        }
+    }
+    
+    func reset(){
+        self.isPlaying = false
+        self.audioPlayerView.setPlayingState(self.isPlaying)
+        self.currentTime = 0
+    }
+    
     func play(){
         if self.streamer?.state == AS_PAUSED {
             self.streamer?.seekToTime(Double(self.currentTime))
         }
         self.streamer?.start()
+        self.audioPlayerView.setPlayingState(self.isPlaying)
     }
     
     func pause(){
-        self.streamer?.pause()
+        if self.streamer?.state == AS_PLAYING {
+            self.streamer?.pause()
+            self.audioPlayerView.setPlayingState(self.isPlaying)
+        }
     }
     
     func updateTimeline(){
@@ -55,10 +78,7 @@ class PTAudioPlayerController: NSObject {
         self.audioPlayerView.updateCurrentTime(currentTime)
     }
     
-    func createStreamer(){
-        self.destroyStreamer()
-        streamer = AudioStreamer(URL: NSURL(string:"http://od.qingting.fm/vod/00/00/0000000000000000000025364530_24.m4a"))
-    }
+    
     
     func streamerNotification(notification:NSNotification){
         if let streamer:AudioStreamer = notification.object as? AudioStreamer{
@@ -67,16 +87,14 @@ class PTAudioPlayerController: NSObject {
         if streamer?.state == AS_PLAYING {
             self.scheduleTimer()
         }else{
+            if streamer?.state == AS_STOPPED {
+                // Reach the end of streaming, reset everything
+                self.reset()
+            }
+            
             if let a = self.timer {
                 a.invalidate()
             }
-        }
-    }
-    
-    func destroyStreamer(){
-        if let a = streamer{
-            NSNotificationCenter.defaultCenter().removeObserver(self, name: ASStatusChangedNotification, object: a)
-            a.stop()
         }
     }
     
@@ -85,7 +103,7 @@ class PTAudioPlayerController: NSObject {
             _audioPlayerView = PTAudioPlayerView(frame:CGRectZero)
             _audioPlayerView?.buttonToggleClosure = {
                 self.isPlaying = !self.isPlaying
-                self.audioPlayerView.setPlayingState(self.isPlaying)
+                
                 if self.isPlaying {
                     self.play()
                 }else{

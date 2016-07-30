@@ -51,6 +51,8 @@ class PTAudioPlayerController: NSObject {
         self.isPlaying = false
         self.audioPlayerView.setPlayingState(self.isPlaying)
         self.currentTime = 0
+        self.audioPlayerView.updateCurrentTime(currentTime)
+        self.audioPlayerView.disableSlider(true)
     }
     
     func play(){
@@ -59,15 +61,11 @@ class PTAudioPlayerController: NSObject {
             self.streamer?.seekToTime(Double(self.currentTime))
         }
         self.streamer?.start()
-        self.isPlaying = true
-        self.audioPlayerView.setPlayingState(self.isPlaying)
     }
     
     func pause(){
         if self.streamer?.state == AS_PLAYING {
-            self.isPlaying = false
             self.streamer?.pause()
-            self.audioPlayerView.setPlayingState(self.isPlaying)
         }
     }
     
@@ -88,12 +86,20 @@ class PTAudioPlayerController: NSObject {
             print("\(streamer.state)")
             if streamer.state == AS_PLAYING {
                 self.scheduleTimer()
+                self.isPlaying = true
+                self.audioPlayerView.setPlayingState(self.isPlaying)
+                self.audioPlayerView.disableSlider(false)
+
             }else{
+                self.isPlaying = false
+                self.audioPlayerView.setPlayingState(self.isPlaying)
+                self.audioPlayerView.disableSlider(true)
                 if streamer.state == AS_STOPPED {
                     // Reach the end of streaming, reset everything
                     self.reset()
+                    
                 }
-                
+      
                 if let a = self.timer {
                     a.invalidate()
                 }
@@ -105,12 +111,29 @@ class PTAudioPlayerController: NSObject {
         if _audioPlayerView == nil {
             _audioPlayerView = PTAudioPlayerView(frame:CGRectZero)
             _audioPlayerView?.buttonToggleClosure = {
-                
                 if !self.isPlaying {
                     self.play()
                 }else{
                     self.pause()
                 }
+            }
+            _audioPlayerView?.sliderTouchBeganClosure = { (slider:UISlider) in
+                if let a = self.timer {
+                    a.invalidate()
+                }
+            }
+            _audioPlayerView?.sliderTouchEndedClosure = { (slider:UISlider) in
+                self.audioPlayerView.disableSlider(true)
+                if self.isPlaying {
+                    self.scheduleTimer()
+                }
+
+                self.streamer?.seekToTime(Double(self.currentTime))
+            }
+            
+            _audioPlayerView?.sliderValueChangedClosure = { (slider:UISlider) in
+                self.currentTime = Int(slider.value)
+               self.audioPlayerView.updateCurrentTime(self.currentTime)
             }
         }
         return _audioPlayerView!

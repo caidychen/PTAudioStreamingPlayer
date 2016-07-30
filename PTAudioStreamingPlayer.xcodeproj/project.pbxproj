@@ -118,6 +118,7 @@
 				TargetAttributes = {
 					C6D47D731D4AF800001C8897 = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 2UEMNRA856;
 					};
 				};
 			};
@@ -280,11 +281,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = PTAudioStreamingPlayer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kids.putao.cn.PTAudioStreamingPlayer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kdchen.PTAudioStreamingPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "PTAudioStreamingPlayer/PTAudioStreamingPlayer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -295,11 +299,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = PTAudioStreamingPlayer/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.kids.putao.cn.PTAudioStreamingPlayer;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kdchen.PTAudioStreamingPlayer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "PTAudioStreamingPlayer/PTAudioStreamingPlayer-Bridging-Header.h";
 			};
 			name = Release;

@@ -11,6 +11,7 @@ import UIKit
 typealias ButtonToggleClosure = () -> ()
 typealias SliderTouchBeganClosure = (slider:UISlider) -> ()
 typealias SliderTouchEndedClosure = (slider:UISlider) -> ()
+typealias SliderValueChangeClosure = (slider:UISlider) -> ()
 
 let kTimelineControlHeight:CGFloat = 30.0
 
@@ -24,6 +25,7 @@ class PTAudioPlayerView: UIView {
     var buttonToggleClosure:ButtonToggleClosure?
     var sliderTouchBeganClosure:SliderTouchBeganClosure?
     var sliderTouchEndedClosure:SliderTouchEndedClosure?
+    var sliderValueChangedClosure:SliderValueChangeClosure?
     var currentTime:Int = 0
     var totalTime:Double = 0.0
     
@@ -79,6 +81,10 @@ class PTAudioPlayerView: UIView {
         self.playButton.center = CGPointMake(self.frame.size.width/2, kTimelineControlHeight+(self.frame.size.height-kTimelineControlHeight)/2)
     }
     
+    func disableSlider(state:Bool){
+        self.slider.userInteractionEnabled = !state
+    }
+    
     func setPlayingState(state:Bool){
         if state {
             // set to pause view
@@ -98,6 +104,12 @@ class PTAudioPlayerView: UIView {
     func sliderTouchEnded(){
         print("Slider touch Ended")
         if let a = self.sliderTouchEndedClosure {
+            a(slider: self.slider)
+        }
+    }
+    
+    func sliderValueDidChange(){
+        if let a = self.sliderValueChangedClosure {
             a(slider: self.slider)
         }
     }
@@ -135,6 +147,7 @@ class PTAudioPlayerView: UIView {
             _slider?.currentThumbImage
             _slider?.addTarget(self, action: #selector(sliderTouchBegan), forControlEvents: .TouchDown)
             _slider?.addTarget(self, action: #selector(sliderTouchEnded), forControlEvents: .TouchUpInside)
+            _slider?.addTarget(self, action: #selector(sliderValueDidChange), forControlEvents: .ValueChanged)
         }
         return _slider!
     }

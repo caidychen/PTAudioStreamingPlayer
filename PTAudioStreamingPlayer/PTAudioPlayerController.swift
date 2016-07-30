@@ -14,16 +14,16 @@ class PTAudioPlayerController: NSObject {
     var streamer:AudioStreamer?
     var timer:NSTimer?
     
+    var downdingUpdater:NSTimer?
+    
     var currentTime = 0
     var totalTime = 0.0
     var isPlaying:Bool = false
+    var audioURL:String?
     
-    override init() {
+     init(audioURL:String) {
         super.init()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PTAudioPlayerController.streamerNotification(_:)), name: ASStatusChangedNotification, object: self.streamer)
-        
-        self.createStreamer()
-        self.reset()
+        self.audioURL = audioURL
     }
     
     func scheduleTimer(){
@@ -36,13 +36,18 @@ class PTAudioPlayerController: NSObject {
     }
     
     func createStreamer(){
+        self.reset()
         self.destroyStreamer()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PTAudioPlayerController.streamerNotification(_:)), name: ASStatusChangedNotification, object: self.streamer)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(didEnterBackground), name: UIApplicationWillResignActiveNotification, object: nil)
         streamer = AudioStreamer(URL: NSURL(string:"http://od.qingting.fm/vod/00/00/0000000000000000000025364530_24.m4a"))
+//        self.downdingUpdater = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: #selector(updateDownloadProgress), userInfo: nil, repeats: true)
     }
     
     func destroyStreamer(){
         if let a = streamer{
             NSNotificationCenter.defaultCenter().removeObserver(self, name: ASStatusChangedNotification, object: a)
+            NSNotificationCenter.defaultCenter().removeObserver(self, name: UIApplicationWillResignActiveNotification, object: nil)
             a.stop()
         }
     }
@@ -56,11 +61,15 @@ class PTAudioPlayerController: NSObject {
     }
     
     func play(){
-        if self.streamer?.state == AS_PAUSED {
-            // This is to avoid progress bar out of sync by snapping current timeline into Integer value
-            self.streamer?.seekToTime(Double(self.currentTime))
+        if let a = self.streamer{
+            if a.state == AS_PAUSED {
+                // This is to avoid progress bar out of sync by snapping current timeline into Integer value
+                a.seekToTime(Double(self.currentTime))
+            }
+            a.start()
+        }else{
+            print("Streamer not initialised. Please check if createStreamer() is called.")
         }
-        self.streamer?.start()
     }
     
     func pause(){
@@ -79,7 +88,15 @@ class PTAudioPlayerController: NSObject {
         self.audioPlayerView.updateCurrentTime(currentTime)
     }
     
+    func updateDownloadProgress(){
+        print("\(self.streamer?.duration)")
+    }
     
+    func didEnterBackground(){
+        self.isPlaying = false
+        self.audioPlayerView.setPlayingState(self.isPlaying)
+        self.pause()
+    }
     
     func streamerNotification(notification:NSNotification){
         if let streamer:AudioStreamer = notification.object as? AudioStreamer{
@@ -89,7 +106,7 @@ class PTAudioPlayerController: NSObject {
                 self.isPlaying = true
                 self.audioPlayerView.setPlayingState(self.isPlaying)
                 self.audioPlayerView.disableSlider(false)
-
+                self.audioPlayerView.stopLoadingAnimation()
             }else{
                 self.isPlaying = false
                 self.audioPlayerView.setPlayingState(self.isPlaying)
@@ -97,6 +114,11 @@ class PTAudioPlayerController: NSObject {
                 if streamer.state == AS_STOPPED {
                     // Reach the end of streaming, reset everything
                     self.reset()
+                    
+                }else{
+                    if streamer.state != AS_PAUSED{
+                        self.audioPlayerView.startLoadingAnimation()
+                    }
                     
                 }
       

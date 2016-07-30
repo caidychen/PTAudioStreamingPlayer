@@ -22,6 +22,7 @@ class PTAudioPlayerView: UIView {
     var _slider: CustomUISlider?
     var _progressBar: CustomProgressBar?
     var _playButton:UIButton?
+    var _loadingView:UIActivityIndicatorView?
     var buttonToggleClosure:ButtonToggleClosure?
     var sliderTouchBeganClosure:SliderTouchBeganClosure?
     var sliderTouchEndedClosure:SliderTouchEndedClosure?
@@ -36,6 +37,7 @@ class PTAudioPlayerView: UIView {
         self.addSubview(self.progressBar)
         self.addSubview(self.slider)
         self.addSubview(self.playButton)
+//        self.addSubview(self.loadingView)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -79,6 +81,16 @@ class PTAudioPlayerView: UIView {
         self.progressBar.frame = CGRectMake(self.currentTimeLabel.frame.size.width, kTimelineControlHeight/2-5, self.bounds.size.width-60*2, 10)
         self.slider.frame = CGRectMake(self.currentTimeLabel.frame.size.width, kTimelineControlHeight/2-5,  self.bounds.size.width-60*2, kTimelineControlHeight)
         self.playButton.center = CGPointMake(self.frame.size.width/2, kTimelineControlHeight+(self.frame.size.height-kTimelineControlHeight)/2)
+    }
+    
+    func startLoadingAnimation(){
+        self.loadingView.center = CGPointMake(self.progressBar.bounds.size.width*(CGFloat(self.slider.value/Float(self.totalTime)))+self.progressBar.frame.origin.x, self.progressBar.center.y)
+        self.loadingView.hidden = false
+        self.loadingView.startAnimating()
+    }
+    
+    func stopLoadingAnimation(){
+        self.loadingView.stopAnimating()
     }
     
     func disableSlider(state:Bool){
@@ -167,5 +179,14 @@ class PTAudioPlayerView: UIView {
             _playButton?.addTarget(self, action: #selector(togglePlayButton), forControlEvents: .TouchUpInside)
         }
         return _playButton!
+    }
+    
+    var loadingView:UIActivityIndicatorView{
+        if _loadingView == nil {
+            _loadingView = UIActivityIndicatorView(activityIndicatorStyle: .Gray)
+            _loadingView?.hidesWhenStopped = true
+            _loadingView?.hidden = true
+        }
+        return _loadingView!
     }
 }

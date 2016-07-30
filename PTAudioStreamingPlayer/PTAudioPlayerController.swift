@@ -40,7 +40,10 @@ class PTAudioPlayerController: NSObject {
         self.destroyStreamer()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PTAudioPlayerController.streamerNotification(_:)), name: ASStatusChangedNotification, object: self.streamer)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(didEnterBackground), name: UIApplicationWillResignActiveNotification, object: nil)
-        streamer = AudioStreamer(URL: NSURL(string:"http://od.qingting.fm/vod/00/00/0000000000000000000025364530_24.m4a"))
+        if let a = self.audioURL {
+            streamer = AudioStreamer(URL: NSURL(string:a))
+        }
+        
 //        self.downdingUpdater = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: #selector(updateDownloadProgress), userInfo: nil, repeats: true)
     }
     

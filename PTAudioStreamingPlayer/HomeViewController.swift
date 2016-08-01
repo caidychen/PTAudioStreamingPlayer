@@ -18,9 +18,9 @@ class HomeViewController: UIViewController {
         
         playerController.audioPlayerView.frame = CGRectMake(0, 200, UIScreen.mainScreen().bounds.size.width, 100)
         self.view.addSubview(playerController.audioPlayerView)
-        playerController.setAttribute(146, progressColor: UIColor.whiteColor(), loadingColor: UIColor.grayColor())
+        playerController.setAttribute(146, progressColor: UIColor.whiteColor(), loadingColor: UIColor.grayColor()) // 146是秒单位，歌曲总时间
         playerController.createStreamer()
-
+        
     }
     
     override func didReceiveMemoryWarning() {

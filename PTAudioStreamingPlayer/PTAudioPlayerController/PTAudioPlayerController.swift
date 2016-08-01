@@ -21,7 +21,7 @@ class PTAudioPlayerController: NSObject {
     var isPlaying:Bool = false
     var audioURL:String?
     
-     init(audioURL:String) {
+    init(audioURL:String) {
         super.init()
         self.audioURL = audioURL
     }
@@ -44,7 +44,7 @@ class PTAudioPlayerController: NSObject {
             streamer = AudioStreamer(URL: NSURL(string:a))
         }
         
-//        self.downdingUpdater = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: #selector(updateDownloadProgress), userInfo: nil, repeats: true)
+        //        self.downdingUpdater = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: #selector(updateDownloadProgress), userInfo: nil, repeats: true)
     }
     
     func destroyStreamer(){
@@ -96,9 +96,9 @@ class PTAudioPlayerController: NSObject {
     }
     
     func didEnterBackground(){
-        self.isPlaying = false
-        self.audioPlayerView.setPlayingState(self.isPlaying)
-        self.pause()
+        //        self.isPlaying = false
+        //        self.audioPlayerView.setPlayingState(self.isPlaying)
+        //        self.pause()
     }
     
     func streamerNotification(notification:NSNotification){
@@ -121,10 +121,12 @@ class PTAudioPlayerController: NSObject {
                 }else{
                     if streamer.state != AS_PAUSED{
                         self.audioPlayerView.startLoadingAnimation()
+                    }else{
+                        self.audioPlayerView.disableSlider(false)
                     }
                     
                 }
-      
+                
                 if let a = self.timer {
                     a.invalidate()
                 }
@@ -152,13 +154,13 @@ class PTAudioPlayerController: NSObject {
                 if self.isPlaying {
                     self.scheduleTimer()
                 }
-
+                
                 self.streamer?.seekToTime(Double(self.currentTime))
             }
             
             _audioPlayerView?.sliderValueChangedClosure = { (slider:UISlider) in
                 self.currentTime = Int(slider.value)
-               self.audioPlayerView.updateCurrentTime(self.currentTime)
+                self.audioPlayerView.updateCurrentTime(self.currentTime)
             }
         }
         return _audioPlayerView!

@@ -37,7 +37,7 @@ class PTAudioPlayerView: UIView {
         self.addSubview(self.progressBar)
         self.addSubview(self.slider)
         self.addSubview(self.playButton)
-//        self.addSubview(self.loadingView)
+        //        self.addSubview(self.loadingView)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -100,9 +100,11 @@ class PTAudioPlayerView: UIView {
     func setPlayingState(state:Bool){
         if state {
             // set to pause view
-            self.playButton.setTitle("Pause", forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_pause_nor"), forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_pause_sel"), forState: .Highlighted)
         }else{
-            self.playButton.setTitle("Play", forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_play_nor"), forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_play_sel"), forState: .Highlighted)
         }
     }
     
@@ -174,8 +176,10 @@ class PTAudioPlayerView: UIView {
     
     var playButton:UIButton{
         if _playButton == nil {
-            _playButton = UIButton(frame: CGRectMake(0, 0, 80, 30))
+            _playButton = UIButton(frame: CGRectMake(0, 0, 60, 60))
             _playButton?.setTitle("Play", forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_play_nor"), forState: .Normal)
+            _playButton?.setImage(UIImage(named:"btn_60_song_play_sel"), forState: .Highlighted)
             _playButton?.addTarget(self, action: #selector(togglePlayButton), forControlEvents: .TouchUpInside)
         }
         return _playButton!
